@@ -1,10 +1,13 @@
 # envpact-action
 
+[![Stars](https://img.shields.io/github/stars/chirag127/envpact-gh-action?style=social)](https://github.com/chirag127/envpact-gh-action/stargazers)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 [![Marketplace](https://img.shields.io/badge/marketplace-envpact-blue?logo=githubactions)](https://github.com/marketplace/actions/envpact)
 
 GitHub Action for **envpact** — resolve secrets from your private
 vault and write a `.env` file at the start of every CI/CD job.
+
+**Live docs: [envpact-gh-action.oriz.in](https://envpact-gh-action.oriz.in)**
 
 > Stop maintaining 40 copies of `OPENAI_API_KEY` across 40
 > repository secret pages. One vault, every workflow.
