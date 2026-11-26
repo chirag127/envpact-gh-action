@@ -1,19 +1,43 @@
 # envpact-action
 
-[![Stars](https://img.shields.io/github/stars/chirag127/envpact-gh-action?style=social)](https://github.com/chirag127/envpact-gh-action/stargazers)
+> One vault, every workflow — resolve secrets from your private envpact vault and write a `.env` at the start of any CI/CD job, instead of copy-pasting the same key into 40 repo settings pages.
+
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Stars](https://img.shields.io/github/stars/chirag127/envpact-gh-action?style=social)](https://github.com/chirag127/envpact-gh-action/stargazers)
+[![Last commit](https://img.shields.io/github/last-commit/chirag127/envpact-gh-action)](https://github.com/chirag127/envpact-gh-action/commits)
+[![Node](https://img.shields.io/badge/Node-20-339933?logo=node.js&logoColor=white)](https://nodejs.org)
+[![CI](https://github.com/chirag127/envpact-gh-action/actions/workflows/ci.yml/badge.svg)](https://github.com/chirag127/envpact-gh-action/actions/workflows/ci.yml)
 [![Marketplace](https://img.shields.io/badge/marketplace-envpact-blue?logo=githubactions)](https://github.com/marketplace/actions/envpact)
+[![Live](https://img.shields.io/badge/live-envpact--gh--action.oriz.in-blue)](https://envpact-gh-action.oriz.in)
 
 GitHub Action for **envpact** — resolve secrets from your private
 vault and write a `.env` file at the start of every CI/CD job.
 
-**Live docs: [envpact-gh-action.oriz.in](https://envpact-gh-action.oriz.in)**
+**Links:** [Repo](https://github.com/chirag127/envpact-gh-action) · [Live docs](https://envpact-gh-action.oriz.in) · [Marketplace](https://github.com/marketplace/actions/envpact) · [envpact umbrella](https://chirag127.github.io/envpact/)
 
 > Stop maintaining 40 copies of `OPENAI_API_KEY` across 40
 > repository secret pages. One vault, every workflow.
 
 Part of the [envpact](https://github.com/chirag127/envpact)
 ecosystem.
+
+⭐ **If this is useful, please [star the repo](https://github.com/chirag127/envpact-gh-action/stargazers)** — it helps other developers find it.
+
+## How it works
+
+```mermaid
+flowchart LR
+    subgraph job["CI/CD job (GitHub Actions runner)"]
+        checkout[actions/checkout] --> action[[envpact-action]]
+        action --> env[.env written]
+        action -. export-to-env .-> vars[step env vars]
+        env --> steps[npm ci / build / deploy]
+        vars --> steps
+    end
+    vault[(private vault repo<br/>secrets.json)]
+    action -- fetch via Contents API<br/>using vault-token --> vault
+    action -. sync-github-secrets .-> ghs[repo GitHub Secrets]
+```
 
 ## Usage
 
@@ -146,9 +170,59 @@ project, masks all values in logs, and writes `.env`.
   The vault on-disk format is unchanged; this is a log-readability
   feature only and is independent of the runner's host timezone.
 
+## Environment variables
+
+The action's configuration is passed as **inputs** (documented above).
+Two `env` values are read at runtime (names + purpose only):
+
+| Env var | Purpose |
+| :--- | :--- |
+| `GH_ADMIN_TOKEN` | Admin PAT required only when `sync-github-secrets: true`, to mirror resolved secrets into the current repo's GitHub Secrets. Keep it scoped to the consuming repo. |
+| `ENVPACT_VAULT_TOKEN` | Conventional secret name workflows use for the `vault-token` input (a read-only PAT for the vault repo). |
+
+No secret values live in this repo.
+
+## Tech stack
+
+- **Node 20** action (`runs: node20`, entrypoint `dist/index.js`).
+- Fetches the vault via the GitHub **Contents API** (no full clone).
+- `dist/` is the compiled/bundled action committed for the runner.
+
+## Repo structure
+
+```
+action.yml       # action metadata: inputs, outputs, runs (node20)
+dist/index.js    # compiled action bundle (what the runner executes)
+src/             # action source
+docs/            # full reference (served at envpact-gh-action.oriz.in)
+```
+
+## Related projects — the envpact ecosystem
+
+| Repo | Role |
+| :--- | :--- |
+| [envpact](https://github.com/chirag127/envpact) | Core (Python) vault library |
+| [envpact-npm-cli](https://github.com/chirag127/envpact-npm-cli) | Zero-dependency Node CLI (`envpact-cli`) |
+| [envpact-mcp-server](https://github.com/chirag127/envpact-mcp-server) | MCP server for AI agents |
+| **envpact-gh-action** | GitHub Action — resolve secrets in CI (this repo) |
+| [envpact-registry-publisher-npm-cli](https://github.com/chirag127/envpact-registry-publisher-npm-cli) | Publish MCP servers to every registry |
+
+## Part of the oriz family
+
+One of ~80 [oriz](https://blog.oriz.in) projects — small, sharp,
+open-source tools. The live docs run **$0 on the Cloudflare free tier**.
+
+## Contributing
+
+PRs welcome. Conventional commits are the changelog.
+
+## Status
+
+**Stable.** Listed on the GitHub Marketplace as `envpact`.
+
 ## License
 
-MIT © Chirag Singhal — see [LICENSE](./LICENSE).
+MIT © 2026 Chirag Singhal · chirag@oriz.in — see [LICENSE](./LICENSE).
 
 ## Documentation
 
